@@ -1,11 +1,16 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 
-// Impostazioni OBD
+
 const char* obd_host = "192.168.0.10";
 const int obd_port = 35000;
 
+const char* obd_ssid = "WiFi_OBDII";
+const char* obd_pass = "";
+
 unsigned long startTimer = 0;
+
+
 
 WiFiClient client;
 
@@ -13,7 +18,7 @@ void setup() {
   Serial.begin(115200);
 
   // Connessione alla rete Wi-Fi
-  WiFi.begin("WiFi_OBDII", "");
+  WiFi.begin(obd_ssid, obd_pass);
   while (WiFi.status() != WL_CONNECTED) {
     startTimer = millis();
     while(millis() - startTimer < 500);
@@ -34,8 +39,11 @@ void loop() {
   char c;
   client.print("ATZ\r\n");
   while(millis() - startTimer < 3000);
-  while(client.available()){
+  while(true){
     c = client.read();
+    if(c == '>'){
+      break;
+    }
     Serial.print(c);
   }
   Serial.println("");
@@ -43,8 +51,11 @@ void loop() {
 
   client.print("ATE0\r\n");
   while(millis() - startTimer < 1000);
-  while(client.available()){
+  while(true){
     c = client.read();
+    if(c == '>'){
+      break;
+    }
     Serial.print(c);
   }
   Serial.println("");
@@ -52,17 +63,23 @@ void loop() {
 
   client.print("ATL0\r\n");
   while(millis() - startTimer < 1000);
-  startTimer = millis();
-  while(client.available()){
+  while(true){
     c = client.read();
+    if(c == '>'){
+      break;
+    }
     Serial.print(c);
   }
   Serial.println("");
+  startTimer = millis();
 
   client.print("ATH1\r\n");
   while(millis() - startTimer < 1000);
-  while(client.available()){
+  while(true){
     c = client.read();
+    if(c == '>'){
+      break;
+    }
     Serial.print(c);
   }
   Serial.println("");
@@ -70,8 +87,11 @@ void loop() {
 
   client.print("01 00\r\n");
   while(millis() - startTimer < 1000);
-  while(client.available()){
+  while(true){
     c = client.read();
+    if(c == '>'){
+      break;
+    }
     Serial.print(c);
   }
   Serial.println("");
@@ -79,8 +99,11 @@ void loop() {
 
   client.print("ATDPN\r\n");
   while(millis() - startTimer < 1000);
-  while(client.available()){
+  while(true){
     c = client.read();
+    if(c == '>'){
+      break;
+    }
     Serial.print(c);
   }
   Serial.println("");
@@ -90,9 +113,12 @@ void loop() {
   while(millis() - startTimer < 1000);
   Serial.write(0xFF);
   Serial.write(1);
-  while(client.available()){
+  while(true){
     c = client.read();
-    Serial.write(c);
+    if(c == '>'){
+      break;
+    }
+    Serial.print(c);
   }
   Serial.write(0xFE);
   Serial.println("");
