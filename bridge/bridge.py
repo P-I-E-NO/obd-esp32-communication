@@ -13,25 +13,28 @@ for port in ports:
 try:
     if port_name is not None:
         ser = serial.Serial(port_name, 115200, timeout=0)
+        print(ser)
 except:
     ser = None
 
 inbuffer = bytearray()
-#i = 0
 while True:
-    if not ser is None:
+    if ser is not None:
         if ser.in_waiting > 0:
             lastchar = ser.read(1)
-
-        if lastchar == b'0xff':
-            while True:
-                if lastchar == b'0xfe':
-                    print(inbuffer)
-                    inbuffer = bytearray()
-                    break
+            
+            if lastchar == b'0xff':
+                
+                while True:
+                    
+                    if lastchar == b'0xfe':
+                        print(inbuffer)
+                        inbuffer = bytearray()
+                        break
 
                 inbuffer.extend(lastchar)
                 lastchar = ser.read(1)
+        
                 
 
 

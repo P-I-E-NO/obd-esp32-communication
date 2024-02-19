@@ -54,7 +54,7 @@ void loop() {
   send_command("ATDPN\r\n", 1000);
   //Serial.println("Benza");
   Serial.write(0xFF);
-  //Serial.write(1);
+  Serial.write(1);
   send_command("01 2F\r\n", 1000);
   send_command("01 2F\r\n", 1000);
   Serial.write(0xFE);
