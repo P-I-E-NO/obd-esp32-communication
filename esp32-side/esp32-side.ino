@@ -46,20 +46,17 @@ void loop() {
 
   Serial.println("Connesso al dispositivo OBD!");
 
-  char c;
-
   send_command("ATZ\r\n", 3000);
-  send_command("ATE0\r\n", 0);
-  send_command("ATL0\r\n", 0);
-  send_command("ATH1\r\n", 0);
-  send_command("01 00\r\n", 0);
-  send_command("ATDPN\r\n", 0);
+  send_command("ATE0\r\n", 1000);
+  send_command("ATL0\r\n", 1000);
+  send_command("ATH1\r\n", 1000);
+  send_command("01 00\r\n", 1000);
+  send_command("ATDPN\r\n", 1000);
   //Serial.println("Benza");
-  send_command("01 2F\r\n", 0);
-  //Serial.write(0xFF);
+  Serial.write(0xFF);
   //Serial.write(1);
-  //Serial.write(0xFE);
-  
-
+  send_command("01 2F\r\n", 1000);
+  send_command("01 2F\r\n", 1000);
+  Serial.write(0xFE);
 }
 

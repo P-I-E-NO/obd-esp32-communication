@@ -17,17 +17,21 @@ except:
     ser = None
 
 inbuffer = bytearray()
-i = 0
-while(True):
+#i = 0
+while True:
     if not ser is None:
         if ser.in_waiting > 0:
             lastchar = ser.read(1)
 
-            inbuffer.extend(lastchar)
-            i += 1
-    
-    if i == 200:
-        break
+        if lastchar == b'0xff':
+            while True:
+                if lastchar == b'0xfe':
+                    print(inbuffer)
+                    inbuffer = bytearray()
+                    break
+
+                inbuffer.extend(lastchar)
+                lastchar = ser.read(1)
+                
 
 
-print(inbuffer)
