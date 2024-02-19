@@ -10,9 +10,19 @@ const char* obd_pass = "";
 
 unsigned long startTimer = 0;
 
-
-
 WiFiClient client;
+
+void send_command(char* command, unsigned long delay){
+  char c;
+  client.print(command);
+  while(millis() - startTimer < delay);
+  while(client.available()){
+    c = client.read();
+    Serial.print(c);
+  }
+  Serial.println("");
+  startTimer = millis();
+}
 
 void setup() {
   Serial.begin(115200);
@@ -37,91 +47,19 @@ void loop() {
   Serial.println("Connesso al dispositivo OBD!");
 
   char c;
-  client.print("ATZ\r\n");
-  while(millis() - startTimer < 3000);
-  while(true){
-    c = client.read();
-    if(c == '>'){
-      break;
-    }
-    Serial.print(c);
-  }
-  Serial.println("");
-  startTimer = millis();
 
-  client.print("ATE0\r\n");
-  while(millis() - startTimer < 1000);
-  while(true){
-    c = client.read();
-    if(c == '>'){
-      break;
-    }
-    Serial.print(c);
-  }
-  Serial.println("");
-  startTimer = millis();
+  send_command("ATZ\r\n", 3000);
+  send_command("ATE0\r\n", 0);
+  send_command("ATL0\r\n", 0);
+  send_command("ATH1\r\n", 0);
+  send_command("01 00\r\n", 0);
+  send_command("ATDPN\r\n", 0);
+  //Serial.println("Benza");
+  send_command("01 2F\r\n", 0);
+  //Serial.write(0xFF);
+  //Serial.write(1);
+  //Serial.write(0xFE);
+  
 
-  client.print("ATL0\r\n");
-  while(millis() - startTimer < 1000);
-  while(true){
-    c = client.read();
-    if(c == '>'){
-      break;
-    }
-    Serial.print(c);
-  }
-  Serial.println("");
-  startTimer = millis();
-
-  client.print("ATH1\r\n");
-  while(millis() - startTimer < 1000);
-  while(true){
-    c = client.read();
-    if(c == '>'){
-      break;
-    }
-    Serial.print(c);
-  }
-  Serial.println("");
-  startTimer = millis();
-
-  client.print("01 00\r\n");
-  while(millis() - startTimer < 1000);
-  while(true){
-    c = client.read();
-    if(c == '>'){
-      break;
-    }
-    Serial.print(c);
-  }
-  Serial.println("");
-  startTimer = millis();
-
-  client.print("ATDPN\r\n");
-  while(millis() - startTimer < 1000);
-  while(true){
-    c = client.read();
-    if(c == '>'){
-      break;
-    }
-    Serial.print(c);
-  }
-  Serial.println("");
-  startTimer = millis();
-
-  client.print("01 2F\r\n");
-  while(millis() - startTimer < 1000);
-  Serial.write(0xFF);
-  Serial.write(1);
-  while(true){
-    c = client.read();
-    if(c == '>'){
-      break;
-    }
-    Serial.print(c);
-  }
-  Serial.write(0xFE);
-  Serial.println("");
-  startTimer = millis();
 }
 
