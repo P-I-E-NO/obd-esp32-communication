@@ -22,9 +22,8 @@ while True:
     if ser is not None:
         if ser.in_waiting > 0:
             lastchar = ser.read(1)
-            
+
             if lastchar == b'0xff':
-                
                 while True:
                     
                     if lastchar == b'0xfe':
