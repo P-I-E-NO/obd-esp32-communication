@@ -1,39 +1,74 @@
 import serial
 import serial.tools.list_ports
 import requests
+import json
+import os
 
-#print("available ports: ")
-ports = serial.tools.list_ports.comports()
-port_name = None
+class Bridge():
 
-for port in ports:
-    if "USB" in port.device and "USB to UART" in port.description:
-        port_name = port.device
+    
+    def __init__(self) -> None:
+        self.serial()
 
-try:
-    if port_name is not None:
-        ser = serial.Serial(port_name, 115200, timeout=0)
-        print(ser)
-except:
-    ser = None
+    
+    def serial(self) -> None:  
+        ports = serial.tools.list_ports.comports()
+        port_name = None
 
-inbuffer = bytearray()
-while True:
-    if ser is not None:
-        if ser.in_waiting > 0:
-            lastchar = ser.read(1)
+        self.ser = None
+        for port in ports:
+            if "USB" in port.device and "USB to UART" in port.description:
+                port_name = port.device
 
-            if lastchar == b'0xff':
-                while True:
+        try:
+            if port_name is not None:
+                self.ser = serial.Serial(port_name, 115200, timeout=0)
+        except:
+            self.ser = None
+
+
+    def loop(self) -> None:
+        self.inbuffer = bytearray()
+        while True:
+            if self.ser is not None:
+                if self.ser.in_waiting > 0:
+                    lastchar = self.ser.read(1)
+
+                if lastchar == b'\xff':
+                    while True:
                     
-                    if lastchar == b'0xfe':
-                        print(inbuffer)
-                        inbuffer = bytearray()
-                        break
+                        if lastchar == b'\xfe':
+                            tank = self.get_tank()
+                            if tank != -1:
+                                self.post_data(tank)
+                            self.inbuffer = bytearray()
+                            break
 
-                inbuffer.extend(lastchar)
-                lastchar = ser.read(1)
-        
-                
+                    self.inbuffer.extend(lastchar)
+                    lastchar = self.ser.read(1)
 
 
+    def post_data(self, tank:float) -> None:
+        headers = {"Authorization":f"Bearer {os.environ["TMP_TOKEN_PIENO"]}", 
+                   "Content-Type": "application/json"}
+        data = {"value": int(tank)}
+        requests.post('https://api.pieno.cloud/meter/', data=json.dumps(data), headers=headers)
+        pass
+
+
+    def get_tank(self) -> float:
+        string = self.inbuffer.decode("utf-8", "ignore").replace('\n', '').replace('\r', '').split('>')
+
+        tank_level_resp = string[string.__len__()-1].split()
+
+        try:
+            tank_level = tank_level_resp[2:][3]
+            return (int(tank_level, 16) * 100 / 255)
+        except IndexError:
+            return -1
+
+
+
+if __name__ == '__main__':
+    br = Bridge()
+    br.loop()
