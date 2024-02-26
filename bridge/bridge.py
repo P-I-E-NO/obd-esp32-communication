@@ -3,6 +3,7 @@ import serial.tools.list_ports
 import requests
 import json
 import os
+from typing import Optional
 
 class Bridge():
 
@@ -46,7 +47,7 @@ class Bridge():
                             lastchar = self.ser.read(1)
 
 
-    def get_tank(self) -> float:
+    def get_tank(self) -> Optional[float]:
         string = self.inbuffer.decode("utf-8", "ignore").replace('\n', '').replace('\r', '').split('>')
 
         tank_level_resp = string[string.__len__()-1].split()
