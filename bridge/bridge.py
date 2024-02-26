@@ -33,27 +33,17 @@ class Bridge():
             if self.ser is not None:
                 if self.ser.in_waiting > 0:
                     lastchar = self.ser.read(1)
+                    if lastchar == b'\xff':
+                        while True:
+                            if lastchar == b'\xfe':
+                                tank = self.get_tank()
+                                if tank != -1:
+                                    self.post_data(tank)
+                                self.inbuffer = bytearray()
+                                break
 
-                if lastchar == b'\xff':
-                    while True:
-                    
-                        if lastchar == b'\xfe':
-                            tank = self.get_tank()
-                            if tank != -1:
-                                self.post_data(tank)
-                            self.inbuffer = bytearray()
-                            break
-
-                    self.inbuffer.extend(lastchar)
-                    lastchar = self.ser.read(1)
-
-
-    def post_data(self, tank:float) -> None:
-        headers = {"Authorization":f"Bearer {os.environ["TMP_TOKEN_PIENO"]}", 
-                   "Content-Type": "application/json"}
-        data = {"value": int(tank)}
-        requests.post('https://api.pieno.cloud/meter/', data=json.dumps(data), headers=headers)
-        pass
+                            self.inbuffer.extend(lastchar)
+                            lastchar = self.ser.read(1)
 
 
     def get_tank(self) -> float:
@@ -66,6 +56,16 @@ class Bridge():
             return (int(tank_level, 16) * 100 / 255)
         except IndexError:
             return -1
+        
+    
+    def post_data(self, tank:float) -> None:
+        headers = {"Authorization":f"Bearer {os.environ["TMP_TOKEN_PIENO"]}", 
+                   "Content-Type": "application/json"}
+        data = {"value": round(tank)}
+        response = requests.post('https://api.pieno.cloud/meter/', data=json.dumps(data), headers=headers)
+        print(response.status_code)
+        print(response.json())
+        pass
 
 
 
