@@ -63,6 +63,7 @@ class Bridge():
         headers = {"Authorization":f"Bearer {os.environ["TMP_TOKEN_PIENO"]}", 
                    "Content-Type": "application/json"}
         data = {"value": round(tank)}
+        print(f'Sending tank data to server: {data}%')
         response = requests.post('https://api.pieno.cloud/meter/', data=json.dumps(data), headers=headers)
         print(response.status_code)
         print(response.json())
