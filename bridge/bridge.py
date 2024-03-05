@@ -19,6 +19,7 @@ class Bridge():
         self.ser = None
         for port in ports:
             if "USB" in port.device and "USB to UART" in port.description:
+                print("Successfully connected to microcontroller")
                 port_name = port.device
 
         try:
@@ -63,7 +64,7 @@ class Bridge():
         headers = {"Authorization":f"Bearer {os.environ["TMP_TOKEN_PIENO"]}", 
                    "Content-Type": "application/json"}
         data = {"value": round(tank)}
-        print(f'Sending tank data to server: {data}%')
+        print(f'Sending tank data to server: {round(tank)}%')
         response = requests.post('https://api.pieno.cloud/meter/', data=json.dumps(data), headers=headers)
         print(response.status_code)
         print(response.json())
