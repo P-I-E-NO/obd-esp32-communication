@@ -3,6 +3,7 @@ import serial.tools.list_ports
 import requests
 import json
 import os
+import sys
 from typing import Optional
 
 class Bridge():
@@ -61,14 +62,18 @@ class Bridge():
         
     
     def post_data(self, tank:float) -> None:
-        headers = {"Authorization":f"Bearer {os.environ["TMP_TOKEN_PIENO"]}", 
+        token = input("Insert your token here:\n")
+        
+        if token == '':
+            token = os.environ["TMP_TOKEN_PIENO"]
+        
+        headers = {"Authorization":f"Bearer {token}", 
                    "Content-Type": "application/json"}
         data = {"value": round(tank)}
         print(f'Sending tank data to server: {round(tank)}%')
         response = requests.post('https://api.pieno.cloud/meter/', data=json.dumps(data), headers=headers)
         print(response.status_code)
         print(response.json())
-        pass
 
 
 
